@@ -169,6 +169,37 @@ def qpcrPlot(Data,f,t,s,g):#Data container, file name, sample name, gene name
 	savefig(t+'_'+s+'_'+g+'.png')
 	pass
 
+def askYesNo():
+	print 'please anwser "Y" or "N"'
+	ans = raw_input()
+	if (ans == 'Y' or ans == 'y' or ans == 'Yes' or ans == 'yes'):
+		return(True)
+	elif (ans == 'N' or ans == 'n' or ans == 'No' or ans == 'no'):
+		return(False)
+	elif (True):
+		return(askYesNo())
+
+def QuickPlot(x,y):
+	close()
+	plot(x,y)
+
+	xlabel('x')
+	ylabel('y')
+		
+	grid(True)
+	formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+	ax = subplot(111)
+	ax.yaxis.set_major_formatter(formatter)
+	ax.xaxis.set_major_formatter(formatter)
+	show()
+	print 'save image (Y/N):'
+	ans = askYesNo()
+	if(ans):
+		print 'please enter file name:'
+		ans = raw_input()
+		savefig(ans+'.png')
+	pass
+
 def RoxPlots():
 	files = [f for f in os.listdir('.') if os.path.isfile(f)]
 	for f in files:
@@ -257,6 +288,24 @@ def scf(Data,f,s,g):#Data container, file name, sample name, gene name
 	b = d[k2]-d[k2-1]
 	return(fMax/(1+numpy.e**(c/b)))
 
+def getNormalization(Data,f,s,g):
+	a = Data[f]['Raw Data for Probe FAM-MGB'][s][g][1:-1]
+	print a
+	b = Data[f]['Bkgd Data for Probe FAM-MGB'][s][g][1:-1]
+	print b
+	print len(a)==len(b)
+	c=[]
+	n=[]
+	for k in range(0,len(a)):
+		c.append(int(a[k])-int(b[k]))
+		n.append(int(k))
+	return(c)
+
+def getFucntion(xs,ys,i):
+	z = np.polyfit(xs, ys, i)
+	f = np.poly1d(z)
+	return(f)
+	
 print('imports complete')
 
 #print len(Data)
@@ -281,8 +330,17 @@ for k in Data:
 	#print Data[k]['Bkgd Data for Probe FAM-MGB']
 	for k3 in Data[k]['Raw Data for Probe FAM-MGB']:
 		for k4 in Data[k]['Raw Data for Probe FAM-MGB'][k3]:
-			print(scf(Data,k,k3,k4))
-
+			print '...'
+			try:
+				print '..'
+				c = getNormalization(Data,k,k3,k4)
+				n = []
+				for k in range(1,len(c)+1):
+					n.append(k)
+				QuickPlot(n,c)
+			except(KeyError):
+				print '>'
+				pass
 
 
 
