@@ -231,6 +231,7 @@ def GetAssayResults():
 	files = [f for f in os.listdir('.') if os.path.isfile(f)]
 	for f in files:
 		if(f[-3:]=='csv'):
+			print 'Reading file : ' + f
 			ret[f]={}
 			Data , names = RawParse(readFile(f,','))
 			ret2[f]=Data
@@ -289,11 +290,25 @@ def scf(Data,f,s,g):#Data container, file name, sample name, gene name
 	return(fMax/(1+numpy.e**(c/b)))
 
 def getNormalization(Data,f,s,g):
+#	try:
+#		print 'file:'+str(f in Data.keys())
+#		print 'table:'+str('Raw Data for Probe FAM-MGB' in Data[f].keys())
+#		print 'sample:'+str(s in Data[f]['Raw Data for Probe FAM-MGB'].keys())
+#		print 'gene:' + str(g in Data[f]['Raw Data for Probe FAM-MGB'][s].keys())
+#	except(KeyError):
+#		print 'RawError'
+#	try:
+#		print 'file:'+str(f in Data.keys())
+#		print 'table:'+str('Bkgd Data for Probe FAM-MGB' in Data[f].keys())
+#		print 'sample:'+str(s in Data[f]['Bkgd Data for Probe FAM-MGB'].keys())
+#		print 'gene:' + str(g in Data[f]['Bkgd Data for Probe FAM-MGB'][s].keys())
+#	except(KeyError):
+#		print 'BkgdError'
 	a = Data[f]['Raw Data for Probe FAM-MGB'][s][g][1:-1]
-	print a
+	#print a
 	b = Data[f]['Bkgd Data for Probe FAM-MGB'][s][g][1:-1]
-	print b
-	print len(a)==len(b)
+	#print b
+	#print len(a)==len(b)
 	c=[]
 	n=[]
 	for k in range(0,len(a)):
@@ -301,46 +316,30 @@ def getNormalization(Data,f,s,g):
 		n.append(int(k))
 	return(c)
 
-def getFucntion(xs,ys,i):
+def getPolynomialFunc(xs,ys,i):
 	z = np.polyfit(xs, ys, i)
 	f = np.poly1d(z)
 	return(f)
+
+def logFit(xs,ys,i):
+	print 'before'
+	print xs
+	logxs=[]
+	for k in xs:
+		logxs.append(numpy.log(k))
+	print 'after'
+	print logxs
+	getPolynomialFunc(logxs,ys,i)
 	
-print('imports complete')
-
-#print len(Data)
-#for k in Data:
-#	print k
-#	print len(Data[k]) 
-#	print(len(Data[k][Data[k].keys()[0]]))
 
 
-RoxPlots()
-FamMgbPlots()
-GetAssayResults()
-Data , WholeData = GetAssayResults()
-print Data.keys()
-for k in Data:
-	print Data[k].keys() 
-if not os.path.exists('OutPut'):
-	os.makedirs('OutPut')	
-os.chdir('OutPut')
 
-for k in Data:
-	#print Data[k]['Bkgd Data for Probe FAM-MGB']
-	for k3 in Data[k]['Raw Data for Probe FAM-MGB']:
-		for k4 in Data[k]['Raw Data for Probe FAM-MGB'][k3]:
-			print '...'
-			try:
-				print '..'
-				c = getNormalization(Data,k,k3,k4)
-				n = []
-				for k in range(1,len(c)+1):
-					n.append(k)
-				QuickPlot(n,c)
-			except(KeyError):
-				print '>'
-				pass
+
+
+
+
+
+
 
 
 
