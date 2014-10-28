@@ -200,6 +200,30 @@ def QuickPlot(x,y):
 		savefig(ans+'.png')
 	pass
 
+def QuickerPlot(x):
+	close()
+	y=[]
+	for k in range(1,len(x)+1):
+		y.append(k)
+	plot(x,y)
+
+	xlabel('x')
+	ylabel('y')
+		
+	grid(True)
+	formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
+	ax = subplot(111)
+	ax.yaxis.set_major_formatter(formatter)
+	ax.xaxis.set_major_formatter(formatter)
+	show()
+	print 'save image (Y/N):'
+	ans = askYesNo()
+	if(ans):
+		print 'please enter file name:'
+		ans = raw_input()
+		savefig(ans+'.png')
+	pass
+
 def RoxPlots():
 	files = [f for f in os.listdir('.') if os.path.isfile(f)]
 	for f in files:
