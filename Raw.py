@@ -5,7 +5,7 @@
 #                  /___/__       __                                                             
 #                     / _ \___ _/ /____ _                                                       
 #                    / // / _ `/ __/ _ `/                                                       
-#                   /____/\_,_/\__/\_,_/	    Author :: Kevin Nelson :: kpie314@gmail.com
+#                   /____/\_,_/\__/\_,_/	    Author :: Kevin Nelson + Kyle Heitman :: kpie314@gmail.com
 
 from pylab import *
 import sys
