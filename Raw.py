@@ -5,7 +5,7 @@
 #                  /___/__       __                                                             
 #                     / _ \___ _/ /____ _                                                       
 #                    / // / _ `/ __/ _ `/                                                       
-#                   /____/\_,_/\__/\_,_/	    Author :: Kevin Nelson + Kyle Heitman :: kpie314@gmail.com
+#                   /____/\_,_/\__/\_,_/	    Author :: Kevin Nelson :: kpie314@gmail.com
 
 from pylab import *
 import sys
@@ -105,9 +105,8 @@ def RoxPlot(Data,name):
 	ax.xaxis.set_major_formatter(formatter)
 	savefig('Rox :'+name+'.png')
 	#show()
-	pass
 
-def FamMgbPlot(Data,name):
+def ProbePlot(Data,name):
 	t=Data.keys()
 	t2=Data[t[1]].keys()
 	#print DictPrt2d(Data[t[1]],'\t')
@@ -126,14 +125,13 @@ def FamMgbPlot(Data,name):
 
 	xlabel(temp[0][0])
 	ylabel(temp[2][0])
-	title('FAM-MGB :'+name)
+	title('Probe :'+name)
 	grid(True)
 	formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
 	ax = subplot(111)
 	ax.yaxis.set_major_formatter(formatter)
 	ax.xaxis.set_major_formatter(formatter)
-	savefig('FAM-MGB :'+name+'.png')
-	pass
+	savefig('Probe :'+name+'.png')
 
 def qpcrPlot(Data,f,t,s,g):#Data container, file name, sample name, gene name
 	
@@ -166,7 +164,6 @@ def qpcrPlot(Data,f,t,s,g):#Data container, file name, sample name, gene name
 	ax.yaxis.set_major_formatter(formatter)
 	ax.xaxis.set_major_formatter(formatter)
 	savefig(t+'_'+s+'_'+g+'.png')
-	pass
 
 def askYesNo():
 	print 'please anwser "Y" or "N"'
@@ -197,7 +194,6 @@ def QuickPlot(x,y):
 #		print 'please enter file name:'
 #		ans = raw_input()
 #		savefig(ans+'.png')
-	pass
 
 def QuickerPlot(x):
 	close()
@@ -213,7 +209,6 @@ def QuickerPlot(x):
 	ax.yaxis.set_major_formatter(formatter)
 	ax.xaxis.set_major_formatter(formatter)
 	show()
-	pass
 
 def ClearPlot():
 	close()
@@ -228,7 +223,6 @@ def RoxPlots():
 			os.chdir('OutPut')
 			RoxPlot(Data,f[:-4])
 			os.chdir('..')
-	pass
 
 def FamMgbPlots():
 	files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -240,7 +234,6 @@ def FamMgbPlots():
 			os.chdir('OutPut')
 			FamMgbPlot(Data,f[:-4])
 			os.chdir('..')
-	pass
 
 def GetAssayResults():
 	keyErrorCount=0
