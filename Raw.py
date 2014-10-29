@@ -45,13 +45,12 @@ def RawParse(data):
 	if(len(ends)<len(starts)):
 		ends.append(k)
 	ret={}
-	print 'Making Data With'
-	print names
-	print 'starts'
-	print starts
-	print 'ends'
-	print ends
-	
+#	print 'Making Data With'
+#	print names
+#	print 'starts'
+#	print starts
+#	print 'ends'
+#	print ends
 	if(len(ends)==len(starts) and len(starts)==len(names)):
 		for k in range(0,len(names)):
 			ret[names[k]]={}
@@ -180,7 +179,7 @@ def askYesNo():
 		return(askYesNo())
 
 def QuickPlot(x,y):
-	close()
+	#close()
 	plot(x,y)
 
 	xlabel('x')
@@ -192,12 +191,12 @@ def QuickPlot(x,y):
 	ax.yaxis.set_major_formatter(formatter)
 	ax.xaxis.set_major_formatter(formatter)
 	show()
-	print 'save image (Y/N):'
-	ans = askYesNo()
-	if(ans):
-		print 'please enter file name:'
-		ans = raw_input()
-		savefig(ans+'.png')
+#	print 'save image (Y/N):'
+#	ans = askYesNo()
+#	if(ans):
+#		print 'please enter file name:'
+#		ans = raw_input()
+#		savefig(ans+'.png')
 	pass
 
 def QuickerPlot(x):
@@ -206,23 +205,18 @@ def QuickerPlot(x):
 	for k in range(1,len(x)+1):
 		y.append(k)
 	plot(x,y)
-
 	xlabel('x')
 	ylabel('y')
-		
 	grid(True)
 	formatter = matplotlib.ticker.ScalarFormatter(useOffset=False)
 	ax = subplot(111)
 	ax.yaxis.set_major_formatter(formatter)
 	ax.xaxis.set_major_formatter(formatter)
 	show()
-	print 'save image (Y/N):'
-	ans = askYesNo()
-	if(ans):
-		print 'please enter file name:'
-		ans = raw_input()
-		savefig(ans+'.png')
 	pass
+
+def ClearPlot():
+	close()
 
 def RoxPlots():
 	files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -286,48 +280,8 @@ def GetAssayResults():
 			os.chdir('..')
 	#print 'keyErrorCount='+str(keyErrorCount)
 	return(ret,ret2)
-	
-def scf(Data,f,s,g):#Data container, file name, sample name, gene name
-	
-	d = Data[f]['Raw Data for Probe FAM-MGB'][s][g][1:-1]#Fval
-	k2=0
-	for k in d:
-		d[k2]=float(k)
-		k2+=1
-	print Data[f]['Bkgd Data for Probe FAM-MGB'][s].keys()
-	Bkgd = Data[f]['Bkgd Data for Probe FAM-MGB'][s][g][1:-1]
-	k2=0
-	for k in Bkgd:
-		Bkgd[k2]=float(k)
-		k2+=1
-	fMax= float(max(d))
-	k2=1
-	for k in d:
-		if(k>=(fMax/2)):
-			break
-		k2+=1
-	if(d[k2]-d[k2-1])!=0.:		
-		c = (k2 - 1)+((fMax/2)-d[k2-1])/(d[k2]-d[k2-1])
-	else:
-		return(0)
-	b = d[k2]-d[k2-1]
-	return(fMax/(1+numpy.e**(c/b)))
 
 def getNormalization(Data,f,s,g):
-#	try:
-#		print 'file:'+str(f in Data.keys())
-#		print 'table:'+str('Raw Data for Probe FAM-MGB' in Data[f].keys())
-#		print 'sample:'+str(s in Data[f]['Raw Data for Probe FAM-MGB'].keys())
-#		print 'gene:' + str(g in Data[f]['Raw Data for Probe FAM-MGB'][s].keys())
-#	except(KeyError):
-#		print 'RawError'
-#	try:
-#		print 'file:'+str(f in Data.keys())
-#		print 'table:'+str('Bkgd Data for Probe FAM-MGB' in Data[f].keys())
-#		print 'sample:'+str(s in Data[f]['Bkgd Data for Probe FAM-MGB'].keys())
-#		print 'gene:' + str(g in Data[f]['Bkgd Data for Probe FAM-MGB'][s].keys())
-#	except(KeyError):
-#		print 'BkgdError'
 	a = Data[f]['Raw Data for Probe FAM-MGB'][s][g][1:-1]
 	#print a
 	b = Data[f]['Bkgd Data for Probe FAM-MGB'][s][g][1:-1]
@@ -337,6 +291,21 @@ def getNormalization(Data,f,s,g):
 	n=[]
 	for k in range(0,len(a)):
 		c.append(int(a[k])-int(b[k]))
+		n.append(int(k))
+	return(c)
+
+def getNormalizationMinusNegitive(Data,f,s,g):
+	a = Data[f]['Raw Data for Probe FAM-MGB'][s][g][1:-1]
+	#print a
+	b = Data[f]['Bkgd Data for Probe FAM-MGB'][s][g][1:-1]
+	neg = Data[f]['Raw Data for Probe FAM-MGB']['Negative'][g][1:-1]
+	negbk= Data[f]['Bkgd Data for Probe FAM-MGB']['Negative'][g][1:-1]
+	#print b
+	#print len(a)==len(b)
+	c=[]
+	n=[]
+	for k in range(0,len(a)):
+		c.append(int(a[k])-int(b[k])-(int(neg[k])-int(negbk[k])))
 		n.append(int(k))
 	return(c)
 
@@ -354,9 +323,79 @@ def logFit(xs,ys,i):
 	print 'after'
 	print logxs
 	getPolynomialFunc(logxs,ys,i)
+
+def sigmoid(p,x):
+    x0,y0,c,k=p
+    y = c / (1 + numpy.exp(-k*(x-x0))) + y0
+    return y
+
+def residuals(p,x,y):
+    return y - sigmoid(p,x)
+
+def sigfit(x,y):
+	p_guess=(numpy.median(x),numpy.median(y),1.0,1.0)
+	p, cov, infodict, mesg, ier = scipy.optimize.leastsq(residuals,p_guess,args=(x,y),full_output=1)
+	x0,y0,c,k=p
+	return(x0,y0,c,k)
+
+def getFits(xs):
+	ret={}
+	logFits=[]
+	#polyFits=[]
+	for k in range(0, len(xs)):
+		ys.append(k)
+	for k in range(0,4):
+		logFits.append(logFit(xs,ys,k))
+		polyFits.append(getPolynomialFunc(xs,ys,k))
+	ret['PolyFit']=polyFits
+	ret['logFit']=logFits
+	ret['sigFit']=sigfit(xs,ys)
+	return(ret)
 	
+	
+#http://www.biomedcentral.com/1471-2105/9/326
+def scf(Data,f,s,g):#Data container, file name, sample name, gene name
+	
+	d = Data[f]['Raw Data for Probe FAM-MGB'][s][g][1:-1]#Fval
+	fits=getFits(xs)
+	k2=0
+	for k in d:
+		d[k2]=float(k)
+		k2+=1
+	#print Data[f]['Bkgd Data for Probe FAM-MGB'][s].keys()
+	Bkgd = Data[f]['Bkgd Data for Probe FAM-MGB'][s][g][1:-1]
+	k2=0
+	for k in Bkgd:
+		Bkgd[k2]=float(k)
+		k2+=1
+	fMax= float(max(d))
+	k2=1
+	for k in d:
+		if(k>=(fMax/2)):
+			break
+		k2+=1
+	if(d[k2]-d[k2-1])!=0.:		
+		c = (k2 - 1)+((fMax/2)-d[k2-1])/(d[k2]-d[k2-1])
+	else:
+		return(0)
+	#b = d[k2]-d[k2-1]
+	b = scipy.misc.derivative(numpy.exp(fits['LogFit'][2]),c,dx=1.0,n=1,args=(),order=2)
+	return(fMax/(1+numpy.e**(c/b)))
 
-
+def runscf(Data):
+	ret={}
+	print Data
+	for k in Data:
+		print '\n' 
+		print Data[k].keys()
+		print '\n'		
+		ret[k]={}
+		#print Data[k]['Bkgd Data for Probe FAM-MGB']
+		for k3 in Data[k]['Raw Data for Probe EvaGreen']:
+			ret[k][k3]={}
+			for k4 in Data[k]['Raw Data for Probe EvaGreen'][k3]:
+				ret[k][k3][k4] = scf(Data,k,k3,k4)
+	return (ret)			
 
 
 
